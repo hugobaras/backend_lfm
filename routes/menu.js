@@ -148,4 +148,158 @@ router.get("/menu/category/:id", (req, res) => {
   });
 });
 
+/**
+ * @swagger
+ * /api/menu:
+ *   post:
+ *     summary: Ajouter un nouveau plat au menu
+ *     tags: [Menu]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               category:
+ *                 type: integer
+ *               country:
+ *                 type: integer
+ *               subcategorie:
+ *                 type: integer
+ *               name:
+ *                 type: string
+ *               price:
+ *                 type: number
+ *               description:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Plat ajouté avec succès
+ *       500:
+ *         description: Erreur serveur
+ */
+router.post("/menu", (req, res) => {
+  const { category, country, subcategorie, name, price, description } =
+    req.body;
+  const query = `
+    INSERT INTO menu (category, country, subcategorie, name, price, description)
+    VALUES (?, ?, ?, ?, ?, ?)
+  `;
+
+  connection.query(
+    query,
+    [category, country, subcategorie, name, price, description],
+    (error, results) => {
+      if (error) {
+        console.error("Erreur lors de la création d'un nouveau plat :", error);
+        res.status(500).json({ error: "Erreur interne du serveur" });
+        return;
+      }
+      res.json({ message: "Nouveau plat ajouté avec succès" });
+    }
+  );
+});
+
+/**
+ * @swagger
+ * /api/menu/{id}:
+ *   put:
+ *     summary: Mettre à jour un plat
+ *     tags: [Menu]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               category:
+ *                 type: integer
+ *               country:
+ *                 type: integer
+ *               subcategorie:
+ *                 type: integer
+ *               name:
+ *                 type: string
+ *               price:
+ *                 type: number
+ *               description:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Plat mis à jour avec succès
+ *       500:
+ *         description: Erreur serveur
+ *   delete:
+ *     summary: Supprimer un plat
+ *     tags: [Menu]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Plat supprimé avec succès
+ *       500:
+ *         description: Erreur serveur
+ */
+router.put("/menu/:id", (req, res) => {
+  const menuId = req.params.id;
+  const { category, country, subcategorie, name, price, description } =
+    req.body;
+  const query = `
+    UPDATE menu 
+    SET category = ?, country = ?, subcategorie = ?, name = ?, price = ?, description = ?
+    WHERE id = ?
+  `;
+
+  connection.query(
+    query,
+    [category, country, subcategorie, name, price, description, menuId],
+    (error, results) => {
+      if (error) {
+        console.error("Erreur lors de la mise à jour du plat :", error);
+        res.status(500).json({ error: "Erreur interne du serveur" });
+        return;
+      }
+      res.json({ message: "Plat mis à jour avec succès" });
+    }
+  );
+});
+
+/**
+ * @swagger
+ * /api/menu/{id}:
+ *   delete:
+ *     summary: Delete menu
+ *     responses:
+ *       200:
+ *         description: Delete menu successfully
+ */
+router.delete("/menu/:id", (req, res) => {
+  const menuId = req.params.id;
+  const query = `
+    DELETE FROM menu 
+    WHERE id_menu = ?
+  `;
+
+  connection.query(query, [menuId], (error, results) => {
+    if (error) {
+      console.error("Erreur lors de la suppression du plat :", error);
+      res.status(500).json({ error: "Erreur interne du serveur" });
+      return;
+    }
+    res.json({ message: "Plat supprimé avec succès" });
+  });
+});
+
 module.exports = router;

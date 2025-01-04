@@ -1,31 +1,30 @@
 const express = require("express");
 const cors = require("cors");
-const bodyParser = require("body-parser");
-const swaggerUi = require("swagger-ui-express");
 const swaggerJsDoc = require("swagger-jsdoc");
+const swaggerUi = require("swagger-ui-express");
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 app.use(cors());
-app.use(bodyParser.json());
+app.use(express.json());
 
 const swaggerOptions = {
-  definition: {
+  swaggerDefinition: {
     openapi: "3.0.0",
     info: {
-      title: "La Fleur du Mekong API",
+      title: "API La Fleur du Mekong",
       version: "1.0.0",
-      description: "API pour le restaurant La Fleur du Mekong",
+      description: "API REST pour le restaurant La Fleur du Mekong",
     },
     servers: [
       {
-        url: "http://localhost:3000",
+        url: `http://localhost:${PORT}`,
         description: "Serveur de développement",
       },
     ],
   },
-  apis: ["./routes/*.js", "./index.js"],
+  apis: ["./routes/*.js"],
 };
 
 const swaggerDocs = swaggerJsDoc(swaggerOptions);
@@ -45,8 +44,14 @@ app.get("/", (req, res) => {
   res.send("Backend Node.js with Express and Swagger");
 });
 
+// Routes
 const menuRoutes = require("./routes/menu");
+const reservationRoutes = require("./routes/reservation");
+const userRoutes = require("./routes/user");
+
 app.use("/api", menuRoutes);
+app.use("/api", reservationRoutes);
+app.use("/", userRoutes); // Modification ici pour correspondre aux routes dans user.js
 
 app.listen(PORT, () => {
   console.log(`Serveur en cours d'exécution sur http://localhost:${PORT}`);
