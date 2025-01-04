@@ -97,10 +97,11 @@ router.get("/countries", (req, res) => {
 router.get("/menu", (req, res) => {
   const query = `
     SELECT 
-      m.*,
+      m.id_menu, m.category, m.country, m.subcategorie, m.name, m.price, m.description,
       c.cat_label,
       sc.sub_label,
-      co.flag
+      co.flag,
+      co.name as country_name
     FROM menu m
     LEFT JOIN categorie c ON m.category = c.id
     LEFT JOIN subcategorie sc ON m.subcategorie = sc.id
